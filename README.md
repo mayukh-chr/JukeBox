@@ -1,0 +1,1 @@
+init readme for jukebox, a spotify enabled collaborative jukebox.
