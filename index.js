@@ -1,5 +1,6 @@
 const express = require("express")
 const app = express()
+
 require('dotenv').config()
 
 // app.get('/', (req, res) => {
@@ -21,24 +22,26 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 
 const spotifyApi = new SpotifyWebApi({
-    clientId: process.env.CLIENT_ID, 
+    clientId: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET
-  });
-  
-  // Retrieve an access token
-  spotifyApi
+});
+
+// Retrieve an access token
+spotifyApi
     .clientCredentialsGrant()
     .then(data => {
-      console.log(data.body)
-      spotifyApi.setAccessToken(data.body["access_token"]);
+        console.log(data.body)
+        spotifyApi.setAccessToken(data.body["access_token"]);
     })
     .catch(error => {
-      console.log("Something went wrong when retrieving an access token\n", error);
+        console.log("Something went wrong when retrieving an access token\n", error);
     });
-  
-  
-  // the routes go here:
-  app.get('/', (req, res, next) => {
+
+
+// the routes go here:
+app.get('/', (req, res) => {
     res.render('index')
-  }) // localhost:3000
-  
+    
+}) // localhost:3000
+
+app.listen(3000)
