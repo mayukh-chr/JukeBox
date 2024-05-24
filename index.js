@@ -38,40 +38,60 @@ spotifyApi
         console.log("Something went wrong when retrieving an access token\n", error);
     });
 
-app.get('/login', function(req, res) {
+// the routes go here:
+app.get('/', (req, res) => {
+    res.render('index')
 
-        var state = generateRandomString(16);
-        var scope = 'user-read-private user-read-email user-read-playback-state';
-      
-        res.redirect('https://accounts.spotify.com/authorize?' +
-          querystring.stringify({
+}) // localhost:3000
+
+app.get('/login', (req, res) => {
+
+    var state = generateRandomString(16);
+    var scope = 'user-read-private user-read-email user-read-playback-state user-modify-playback-state';
+
+    res.redirect('https://accounts.spotify.com/authorize?' +
+        querystring.stringify({
             response_type: 'code',
             client_id: process.env.CLIENT_ID,
             scope: scope,
             redirect_uri: process.env.REDIRECT_URI,
             state: state
-          }));
-      });
+        }));
+});
 
-
-// the routes go here:
-app.get('/', (req, res) => {
-    res.render('index')
+app.get('/callback', (req, res) => {
+    const code = req.query.code || null;
     
-}) // localhost:3000
+    console.log(`Authorization code: ${code}`);
+  });
+
+app.get('/currentSong', (req, res) => {
+    spotifyApi.getMyCurrentPlaybackState()
+        .then(function (data) {
+            // Output items
+            if (data.body && data.body.is_playing) {
+                console.log(data.body)
+                console.log("User is currently playing something!");
+            } else {
+                console.log("User is not playing anything, or doing so in private.");
+            }
+        }, function (err) {
+            console.log('Something went wrong!', err);
+        });
+})
 
 
 app.get('/artists', (req, res, next) => {
     //console.log('artist is', req.query.artist)
     spotifyApi
-      .searchArtists(req.query.artist)
-      .then(data => {
-          //console.log("The received data from the API: ", data.body.artists.items);
-          res.render('artists',  {artists: data.body.artists.items, artist: req.query.artist});
-      })
-      .catch(err => {
-          console.log("The error while searching artists occurred: ", err);
-      })
-  });
+        .searchArtists(req.query.artist)
+        .then(data => {
+            //console.log("The received data from the API: ", data.body.artists.items);
+            res.render('artists', { artists: data.body.artists.items, artist: req.query.artist });
+        })
+        .catch(err => {
+            console.log("The error while searching artists occurred: ", err);
+        })
+});
 
 app.listen(3000)
