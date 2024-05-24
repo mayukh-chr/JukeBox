@@ -47,7 +47,7 @@ app.get('/', (req, res) => {
 app.get('/login', (req, res) => {
 
     var state = generateRandomString(16);
-    var scope = 'user-read-private user-read-email user-read-playback-state user-modify-playback-state';
+    var scope = 'user-read-private user-read-email user-read-playback-state';
 
     res.redirect('https://accounts.spotify.com/authorize?' +
         querystring.stringify({
@@ -61,7 +61,7 @@ app.get('/login', (req, res) => {
 
 app.get('/callback', (req, res) => {
     const code = req.query.code || null;
-    
+    res.send(`Authorization code: ${code}`);
     console.log(`Authorization code: ${code}`);
   });
 
