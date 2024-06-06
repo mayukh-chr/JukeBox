@@ -10,6 +10,7 @@ app.set('views', __dirname + '/views');
 app.use(express.static(__dirname + '/public'));
 
 app.use(bodyParser.urlencoded({ extended: true }));
+const code = undefined
 
 function generateRandomString(length) {
     let result = '';
@@ -60,10 +61,22 @@ app.get('/login', (req, res) => {
 });
 
 app.get('/callback', (req, res) => {
-    const code = req.query.code || null;
+    code = req.query.code || null;
     res.send(`Authorization code: ${code}`);
     console.log(`Authorization code: ${code}`);
-  });
+    spotifyApi.getMyCurrentPlaybackState()
+        .then(function (data) {
+            // Output items
+            if (data.body && data.body.is_playing) {
+                console.log(data.body)
+                console.log("User is currently playing something!");
+            } else {
+                console.log("User is not playing anything, or doing so in private.");
+            }
+        }, function (err) {
+            console.log('Something went wrong!', err);
+        });
+});
 
 app.get('/currentSong', (req, res) => {
     spotifyApi.getMyCurrentPlaybackState()
