@@ -8,12 +8,7 @@ require('dotenv').config()
 const request = require('request');
 
 const app = express()
-// app.get('/', (req, res) => {
-//     res.send("lmao xd")
-//     console.log("success at home page")
-// })
 
-// app.listen(3000)
 
 const client_id = process.env.CLIENT_ID; // Your client id
 const client_secret = process.env.CLIENT_SECRET; // Your secret
@@ -21,10 +16,8 @@ var redirect_uri = process.env.REDIRECT_URI;
 
 app.set('view engine', 'hbs');
 app.set('views', __dirname + '/views');
-app.use(express.static(__dirname + '/public'));
-
+// app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({ extended: true }));
-const code = undefined
 
 function generateRandomString(length) {
     let result = '';
@@ -53,6 +46,17 @@ spotifyApi
         console.log("Something went wrong when retrieving an access token\n", error);
     });
 
+var generateRandomString = function (length) {
+    var text = '';
+    var possible =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    
+    for (var i = 0; i < length; i++) {
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
+    };
+    
 // the routes go here:
 app.get('/', (req, res) => {
     // res.render('index')
@@ -60,16 +64,6 @@ app.get('/', (req, res) => {
     
 }) // localhost:3000
 
-var generateRandomString = function (length) {
-    var text = '';
-    var possible =
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  
-    for (var i = 0; i < length; i++) {
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
-  };
 
 
   var stateKey = 'spotify_auth_state';
@@ -89,7 +83,7 @@ var generateRandomString = function (length) {
     // user-read-private & user-read-email used to get current user info
     // user-top-read used to get top track info
     var scope =
-      'user-read-private user-read-email user-top-read playlist-modify-public';
+      'user-read-private user-read-email user-top-read playlist-modify-public user-library-read';
     res.redirect(
       'https://accounts.spotify.com/authorize?' +
         querystring.stringify({
@@ -188,6 +182,27 @@ app.get('/refresh_token', function (req, res) {
       }
     });
   });
+
+  app.get('/liked', (req, res) => {
+    const access_token = req.cookies ? req.cookies['access_token'] : null;
+
+    if (!access_token) {
+        res.redirect('/login');
+        return;
+    }
+
+    spotifyApi.setAccessToken(access_token);
+
+    spotifyApi.getMySavedTracks({ limit: 10 })
+        .then(data => {
+            const tracks = data.body.items.map(item => item.track);
+            res.render('liked', { tracks: tracks });
+        })
+        .catch(err => {
+            console.log('Error fetching liked songs', err);
+            res.send('There was an error fetching your liked songs.');
+        });
+});
   
   app.listen(process.env.PORT || 3000, function () {
     console.log('Server is running on port 3000');
