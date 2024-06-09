@@ -8,24 +8,15 @@
  */
 const express = require("express"); // Express web server framework
 const request = require("request");
-// const axios = require("axios"); // "Request" library
-// const bodyParser = require("body-parser");
-// const cors = require("cors");
 const querystring = require("querystring");
 const cookieParser = require("cookie-parser");
 const fs = require("fs");
 const jwt = require("jsonwebtoken");
-// const https = require("https");
-// const exphbs = require("express-handlebars");
 const cors = require("cors");
-// const { config } = require("./config");
 require("dotenv").config();
 
 const client_id = process.env.CLIENT_ID; // Your client id
 const client_secret = process.env.CLIENT_SECRET; // Your secret
-// const privateKey = fs.readFileSync("AuthKey_A8FKGGUQP3.p8").toString();
-// const teamId = process.env.teamId;
-// const keyId = process.env.keyId;
 
 //var redirect_uri = "https://receiptify.herokuapp.com/callback"; // Your redirect uri
 var redirect_uri = process.env.REDIRECT_URI;
@@ -48,9 +39,6 @@ var generateRandomString = function (length) {
 var stateKey = "spotify_auth_state";
 
 var app = express();
-// app.engine("handlebars", exphbs({ defaultLayout: null }));
-// app.set("view engine", "handlebars");
-// app.set("views", __dirname + "/views");
 app
   .use(express.static(__dirname + "/public"))
   .use(cors())
@@ -74,44 +62,7 @@ app.get("/login", function (req, res) {
   );
 });
 
-// app.get("/applemusic", function (req, res
-//   const token = jwt.sign({}, privateKey, {
-//     algorithm: "ES256",
-//     expiresIn: "180d",
-//     issuer: teamId,
-//     header: {
-//       alg: "ES256",
-//       kid: keyId,
-//     },
-//   });
-
-//   res.redirect(
-//     "/#" +
-//       querystring.stringify({
-//         client: "applemusic",
-//         dev_token: token,
-//       })
-//   );
-//   // res.redirect("https://idmsa.apple.com/IDMSWebAuth/auth?" + querystring.stringify({}))
-//   // let music = MusicKit.getInstance();
-//   // music.authorize().then(console.log("hello"));
-//   // res.sendFile(__dirname + "/public/applemusic.html");
-// });
-
-// app.get("/lastfm", function (req, res) {
-//   // res.redirect(
-//   //   "/#" +
-//   //     querystring.stringify({
-//   //       lastfmKey: lastfmKey,
-//   //       service: "lastfm"
-//   //     })
-//   // );
-//   res.sendFile(__dirname + "/public/lastfm.html");
-// });
-
 app.get("/callback", function (req, res) {
-  // your application requests refresh and access tokens
-  // after checking the state parameter
 
   var code = req.query.code || null;
   var state = req.query.state || null;
@@ -155,13 +106,6 @@ app.get("/callback", function (req, res) {
               refresh_token: refresh_token,
             })
         );
-        // res.redirect("/spotify");
-        // console.log(retrieveTracksSpotify(access_token, "short_term", 1, "LAST MONTH"));
-        // res.render("spotify", {
-        //   shortTerm: retrieveTracksSpotify(access_token, "short_term", 1, "LAST MONTH"),
-        //   mediumTerm: retrieveTracksSpotify(access_token, "medium_term", 2, "LAST 6 MONTHS"),
-        //   longTerm: retrieveTracksSpotify(access_token, "long_term", 3, "ALL TIME")
-        // });
       } else {
         res.send("There was an error during authentication.");
       }
